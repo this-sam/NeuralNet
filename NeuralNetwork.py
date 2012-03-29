@@ -2,10 +2,13 @@
 global copy, math, re, pprint, random
 import copy, math, re, pprint, random
 
+global path
+path = "/Volumes/Macintosh HD 2/Development/NeuralNet/"
+
 
 class NeuralNetwork(object):
 	def __init__(self):
-		self.depth = 3
+		self.depth = 10
 		self.layers =  []
 	
 		#Weight-related definitions:
@@ -55,12 +58,32 @@ class NeuralNetwork(object):
 		for p in range(0,self.M()):
 			self.resetDelta()
 			
-			self.loadInitialValues(p)
-			self.pushSignalForward(p)	
-			self.compareLabels(p)
+			#load initial data
+			for i in range(0, self.m(p)):
+				self.values[0][i] = self.data[p][i]
+			print "First Values:\t",self.values[0]
+		
+			#push signals forward
+			for l in range(1, self.L()):
+				for i in range(1, self.n(l)):
+					self.signals[l][i] = 0
+					for j in range(0, self.n(l-1)):
+						self.signals[l][i] += self.weights[l][i][j]*self.values[l-1][j]
+					self.values[l][i] = self.sigma(self.signals[l][i])
+				print "Inner Values:\t", self.values[l]
+			
+			#compare labels
+			error = 0
+			print "Actual Labels:\t", self.labels[p]
+			print "Final Labels:\t",self.values[self.L()-1]
+			print
+			for i in range(0, self.n(self.L()-1)):
+				error += (self.labels[p][i]-self.values[self.L()-1][i])**2
+				self.Delta[self.L()-1][i] = (self.labels[p][i] - self.values[self.L()-1][i]*\
+											 self.dSigma(self.values[self.L()-1][i]))
 			
  			#propogate error backward
-			for l in range(self.L()-2, 0, -1):
+			for l in range(self.L()-2, -3, -1): #not sure about middle index.
 				for j in range(0, self.n(l)):
 					self.Delta[l][j] = 0
 					for i in range(self.n(l+1)):
@@ -126,6 +149,7 @@ class NeuralNetwork(object):
 		
 		
 	def loadData(self, fname):
+		fname = path+fname
 		data = []
 		labels = []
 		description = []
@@ -198,5 +222,5 @@ if __name__ == '__main__':
 	n = NeuralNetwork()
 	n.loadData('hw3_training.csv')
 	n.backPropogation()
-	pprint.pprint(n.weights)
+	#pprint.pprint(n.weights)
 	#pprint.pprint(n.errorRecord)
