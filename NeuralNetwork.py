@@ -71,11 +71,13 @@ class NeuralNetwork(object):
 					for k in range(self.n(l-1)):
 						self.weights[l][j][k] += self.eta*self.Delta[l][j]*self.values[l-1][k]
 	
+	
 	def predictData(self):
 		for p in range(0,self.M()):
 			self.loadInitialValues(p)
 			self.pushSignalForward(p)	
 			self.compareLabels(p)
+	
 	
 	def resetDelta(self):
 		self.Delta = []
@@ -83,6 +85,7 @@ class NeuralNetwork(object):
 			self.Delta.append([])
 			for j in range(self.n(i)):
 				self.Delta[i].append(0)					
+	
 	
 	def predictLabel(self, p):
 		self.loadInitialValues(p)
