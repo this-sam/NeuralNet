@@ -8,7 +8,8 @@ path = "/Volumes/Macintosh HD 2/Development/NeuralNet/"
 
 class NeuralNetwork(object):
 	def __init__(self):
-		self.depth = 10
+		self.depth = 3
+		self.innerWidth = 5
 		self.layers =  []
 	
 		#Weight-related definitions:
@@ -81,14 +82,19 @@ class NeuralNetwork(object):
 				error += (self.labels[p][i]-self.values[self.L()-1][i])**2
 				self.Delta[self.L()-1][i] = (self.labels[p][i] - self.values[self.L()-1][i]*\
 											 self.dSigma(self.values[self.L()-1][i]))
+				
+			print self.Delta[self.L()-1]
 			
  			#propogate error backward
 			for l in range(self.L()-2, -3, -1): #not sure about middle index.
 				for j in range(0, self.n(l)):
 					self.Delta[l][j] = 0
+					print "Delta:\t",self.Delta[l][j]
 					for i in range(self.n(l+1)):
 						self.Delta[l][j] += self.Delta[l+1][i]*self.weights[l+1][i][j]
+						print "Delta:\t",self.Delta[l][j]
 					self.Delta[l][j] *= 2*self.values[l][j]*(1-self.values[l][j])
+					
 					
 					#adjust the weights
 					for k in range(self.n(l-1)):
@@ -185,8 +191,12 @@ class NeuralNetwork(object):
 	def prepareNetwork(self):
 		for i in range(self.depth):
 			self.layers.append([])
-			for j in range(self.description[1]):
-				self.layers[i].append(1)
+			if (i==0 or i==self.depth-1):
+				innerRange = range(self.description[1])
+			else:
+				innerRange = range(self.innerWidth)
+			for j in innerRange:
+					self.layers[i].append(1)
 	
 		weights = [] #l, i, j
 		
